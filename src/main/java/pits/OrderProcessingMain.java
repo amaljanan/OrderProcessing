@@ -134,25 +134,26 @@ public class OrderProcessingMain {
             csvPrinter.println();
             for (int i = 4; i <= orderSheet.getLastRowNum(); i++) {
                 Row row = orderSheet.getRow(i);
-                for (int j = 0; j <= 14; j++) {
+                for (int j = 0; j <= 15; j++) {
                     if (null != row.getCell(j)) {
                         String value = row.getCell(j).toString();
             /*if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
                 value = value.replaceAll("\\.",",");
             }*/
-                        if (j == 3) {
+                        if (j == 4) {
                             Date date = row.getCell(j).getDateCellValue();
                             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm a");
 
                             value = dateFormat.format(date);
-                        } else if (j == 4
+                        } else if (j == 5
                                 && isEnviornmentUAT
-                                && null != row.getCell(4)
-                                && row.getCell(4).getCellType() != CellType.BLANK) {
-                            String email = row.getCell(4).toString();
+                                && null != row.getCell(5)
+                                && row.getCell(5).getCellType() != CellType.BLANK) {
+                            String email = row.getCell(5).toString();
                             value = "abc".concat(email.toLowerCase(Locale.ROOT));
                         } else if (j == 14
-                                || j == 13
+                                || j == 15
+                                || j == 1
                                 && (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains("."))) {
                             value = value.split("\\.")[0];
                         }
