@@ -57,7 +57,6 @@ public class OrderProcessingMain {
         String fileName = scanner.nextLine();
 
         FileInputStream fileInputStream = new FileInputStream("./Source Folder/" + fileName);
-        // customerFileInputStream.close();
 
         return new XSSFWorkbook(fileInputStream);
     }
@@ -68,7 +67,6 @@ public class OrderProcessingMain {
         String fileName = scanner.nextLine();
 
         FileInputStream fileInputStream = new FileInputStream("./Source Folder/" + fileName);
-        // customerFileInputStream.close();
 
         return new XSSFWorkbook(fileInputStream);
     }
@@ -79,7 +77,6 @@ public class OrderProcessingMain {
         String fileName = scanner.nextLine();
 
         FileInputStream fileInputStream = new FileInputStream("./Source Folder/" + fileName);
-        // customerFileInputStream.close();
 
         return new XSSFWorkbook(fileInputStream);
     }
@@ -107,7 +104,7 @@ public class OrderProcessingMain {
         } finally {
             try {
                 if (csvPrinter != null) {
-                    csvPrinter.flush(); // Flush and close CSVPrinter
+                    csvPrinter.flush();
                     csvPrinter.close();
                 }
             } catch (IOException ioe) {
@@ -130,23 +127,19 @@ public class OrderProcessingMain {
                     csvPrinter.print(cell.toString());
                 }
             }
-            //  csvPrinter.print(null);
             csvPrinter.println();
             for (int i = 4; i <= orderSheet.getLastRowNum(); i++) {
                 Row row = orderSheet.getRow(i);
                 for (int j = 0; j <= 15; j++) {
                     if (null != row.getCell(j)) {
                         String value = row.getCell(j).toString();
-            /*if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
-                value = value.replaceAll("\\.",",");
-            }*/
+
                         if (j == 4) {
                             Date date = row.getCell(j).getDateCellValue();
-                            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm a");
+                            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
                             value = dateFormat.format(date);
                         } else if (j == 5
-                                && isEnviornmentUAT
                                 && null != row.getCell(5)
                                 && row.getCell(5).getCellType() != CellType.BLANK) {
                             String email = row.getCell(5).toString();
@@ -162,7 +155,6 @@ public class OrderProcessingMain {
                         csvPrinter.print(value);
                     } else csvPrinter.print(null);
                 }
-                // csvPrinter.print(null);
                 csvPrinter.println();
             }
         }
@@ -182,16 +174,13 @@ public class OrderProcessingMain {
                     csvPrinter.print(cell.toString());
                 }
             }
-            //  csvPrinter.print(null);
             csvPrinter.println();
             for (int i = 4; i <= addressSheet.getLastRowNum(); i++) {
                 Row row = addressSheet.getRow(i);
                 for (int j = 0; j <= 14; j++) {
                     if (null != row.getCell(j)) {
                         String value = row.getCell(j).toString();
-            /*if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
-                value = value.replaceAll("\\.",",");
-            }*/
+
                         if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
                             value = value.split("\\.")[0];
                         }
@@ -199,7 +188,6 @@ public class OrderProcessingMain {
                         csvPrinter.print(value);
                     } else csvPrinter.print(null);
                 }
-                //  csvPrinter.print(null);
                 csvPrinter.println();
             }
         }
@@ -234,16 +222,13 @@ public class OrderProcessingMain {
                         csvPrinter.print(cell.toString());
                     }
                 }
-                //  csvPrinter.print(null);
                 csvPrinter.println();
                 for (int i = 5; i <= orderEntrySheet.getLastRowNum(); i++) {
                     Row row = orderEntrySheet.getRow(i);
                     for (int j = 0; j <= 7; j++) {
                         if (null != row.getCell(j)) {
                             String value = row.getCell(j).toString();
-              /*if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
-                  value = value.replaceAll("\\.",",");
-              }*/
+
                             if (j != 6
                                     && j != 7
                                     && row.getCell(j).getCellType() == CellType.NUMERIC
@@ -254,7 +239,6 @@ public class OrderProcessingMain {
                             csvPrinter.print(value);
                         } else csvPrinter.print(null);
                     }
-                    //  csvPrinter.print(null);
                     csvPrinter.println();
                 }
             }
@@ -265,7 +249,7 @@ public class OrderProcessingMain {
         } finally {
             try {
                 if (csvPrinter != null) {
-                    csvPrinter.flush(); // Flush and close CSVPrinter
+                    csvPrinter.flush();
                     csvPrinter.close();
                 }
             } catch (IOException ioe) {
