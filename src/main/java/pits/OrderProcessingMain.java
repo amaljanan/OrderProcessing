@@ -150,7 +150,8 @@ public class OrderProcessingMain {
                                 && null != row.getCell(5)
                                 && row.getCell(5).getCellType() != CellType.BLANK) {
                             String email = row.getCell(5).toString();
-                            value = "abc".concat(email.toLowerCase(Locale.ROOT));
+                            if (isEnviornmentUAT) value = "abc".concat(email.toLowerCase(Locale.ROOT));
+                            else value = email.toLowerCase(Locale.ROOT);
                         } else if (j == 14
                                 || j == 15
                                 || j == 1
