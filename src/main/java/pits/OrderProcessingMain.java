@@ -133,7 +133,7 @@ public class OrderProcessingMain {
       csvPrinter.println();
       for (int i = 4; i <= orderSheet.getLastRowNum(); i++) {
         Row row = orderSheet.getRow(i);
-        if (null != row && row.getCell(1).getCellType() != CellType.BLANK) {
+        if (null != row.getCell(1) && row.getCell(1).getCellType() != CellType.BLANK) {
           for (int j = 0; j <= 15; j++) {
             if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
               String value = row.getCell(j).toString();
@@ -185,7 +185,7 @@ public class OrderProcessingMain {
       csvPrinter.println();
       for (int i = 4; i <= addressSheet.getLastRowNum(); i++) {
         Row row = addressSheet.getRow(i);
-        if (null != row && row.getCell(1).getCellType() != CellType.BLANK) {
+        if (null != row.getCell(1) && row.getCell(1).getCellType() != CellType.BLANK) {
           for (int j = 0; j <= 14; j++) {
 
             if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
@@ -235,21 +235,23 @@ public class OrderProcessingMain {
         csvPrinter.println();
         for (int i = 5; i <= orderEntrySheet.getLastRowNum(); i++) {
           Row row = orderEntrySheet.getRow(i);
-          for (int j = 0; j <= 7; j++) {
-            if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
-              String value = row.getCell(j).toString();
+          if (null != row.getCell(1) && row.getCell(1).getCellType() != CellType.BLANK) {
+            for (int j = 0; j <= 7; j++) {
+              if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
+                String value = row.getCell(j).toString();
 
-              if (j != 6
-                      && j != 7
-                      && row.getCell(j).getCellType() == CellType.NUMERIC
-                      && value.contains(".")) {
-                value = value.split("\\.")[0];
-              }
+                if (j != 6
+                        && j != 7
+                        && row.getCell(j).getCellType() == CellType.NUMERIC
+                        && value.contains(".")) {
+                  value = value.split("\\.")[0];
+                }
 
-              csvPrinter.print(value);
-            } else csvPrinter.print(null);
+                csvPrinter.print(value);
+              } else csvPrinter.print(null);
+            }
+            csvPrinter.println();
           }
-          csvPrinter.println();
         }
       }
 
