@@ -6,18 +6,17 @@ import org.apache.commons.csv.QuoteMode;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 public class OrderProcessingMain {
 
@@ -172,7 +171,22 @@ public class OrderProcessingMain {
           throws IOException {
 
     if (addressWorkBook != null) {
+      Map<String, String> orderAddressMap = new HashMap<>();
+      XSSFWorkbook deletedEntriesWorkBook = new XSSFWorkbook();
       XSSFSheet addressSheet = addressWorkBook.getSheet("Address");
+      XSSFSheet deletedAddressSheet = deletedEntriesWorkBook.createSheet("Deleted Addresses");
+
+
+      int deleteSheetRowNumber = 0;
+
+      XSSFRow deletedCustomerHeaderRow = deletedAddressSheet.createRow(deleteSheetRowNumber);
+
+      deletedCustomerHeaderRow.createCell(0).setCellValue("Address Id");
+      deletedCustomerHeaderRow.createCell(1).setCellValue("Order Id");
+      deletedCustomerHeaderRow.createCell(3).setCellValue("Reason");
+
+      deleteSheetRowNumber++;
+
 
       Row headerRow = addressSheet.getRow(2);
       Iterator<Cell> cellIterator = headerRow.cellIterator();
@@ -186,20 +200,39 @@ public class OrderProcessingMain {
       for (int i = 4; i <= addressSheet.getLastRowNum(); i++) {
         Row row = addressSheet.getRow(i);
         if (null != row.getCell(1) && row.getCell(1).getCellType() != CellType.BLANK) {
-          for (int j = 0; j <= 14; j++) {
+          if(!orderAddressMap.containsKey(row.getCell(1).toString())){
+            orderAddressMap.put(row.getCell(1).toString(),row.getCell(2).toString());
+            for (int j = 0; j <= 14; j++) {
+              if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
+                String value = row.getCell(j).toString();
 
-            if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
-              String value = row.getCell(j).toString();
+                if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
+                  value = value.split("\\.")[0];
+                }
+                csvPrinter.print(value);
+              } else csvPrinter.print(null);
+            }
+            csvPrinter.println();
+          }else{
+            XSSFRow deletedRow = deletedAddressSheet.createRow(deleteSheetRowNumber++);
 
-              if (row.getCell(j).getCellType() == CellType.NUMERIC && value.contains(".")) {
-                value = value.split("\\.")[0];
-              }
-              csvPrinter.print(value);
-            } else csvPrinter.print(null);
+            deletedRow
+                    .createCell(0)
+                    .setCellValue(addressSheet.getRow(i).getCell(1).toString());
+            deletedRow
+                    .createCell(1)
+                    .setCellValue(addressSheet.getRow(i).getCell(2).toString());
+            deletedRow
+                    .createCell(3)
+                    .setCellValue("Reason for deletion : Duplicate AddressId");
           }
-          csvPrinter.println();
         }
       }
+
+      FileOutputStream deletedRecordsFileOutputStream =
+              new FileOutputStream("./Target Folder/DeletedRecords.xlsx");
+      deletedEntriesWorkBook.write(deletedRecordsFileOutputStream);
+      deletedRecordsFileOutputStream.close();
     }
   }
 
