@@ -41,8 +41,12 @@ public class OrderProcessingMain {
 
       XSSFWorkbook addressWorkBook = importAddressWorkBook(scanner);
 
+      XSSFWorkbook deletedEntriesWorkBook = new XSSFWorkbook();
+      
+      validateOrderEntryMapping(orderWorkBook,orderEntryWorkBook,deletedEntriesWorkBook);
+
       System.out.println("Started creating Order-Address impex file");
-      createOrderAndAddressImpexFile(orderWorkBook, addressWorkBook, isEnviornmentUAT);
+      createOrderAndAddressImpexFile(orderWorkBook, addressWorkBook, deletedEntriesWorkBook, isEnviornmentUAT);
 
       System.out.println("Started creating Order Entry impex file");
       createOrderEntryImpexFile(orderEntryWorkBook);
@@ -50,6 +54,50 @@ public class OrderProcessingMain {
       System.out.println("Impex files created");
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  private static void validateOrderEntryMapping(XSSFWorkbook orderWorkBook, XSSFWorkbook orderEntryWorkBook, XSSFWorkbook deletedEntriesWorkBook) {
+
+    XSSFSheet orderSheet = orderWorkBook.getSheet("Order");
+    XSSFSheet orderEntrySheet = orderEntryWorkBook.getSheet("OrderEntry");
+
+    XSSFSheet deletedOrderEntrySheet = deletedEntriesWorkBook.createSheet("Deleted Order Entry");
+
+    int deleteSheetRowNumber = 0;
+
+    XSSFRow deletedCustomerHeaderRow = deletedOrderEntrySheet.createRow(deleteSheetRowNumber);
+
+    deletedCustomerHeaderRow.createCell(0).setCellValue("Order Id");
+    deletedCustomerHeaderRow.createCell(3).setCellValue("Reason");
+
+    deleteSheetRowNumber++;
+
+    TreeMap<Integer,String> orderMap = new TreeMap<>();
+
+    for (int j = 4; j <= orderSheet.getLastRowNum(); j++) {
+      Row row = orderSheet.getRow(j);
+        orderMap.put((int) row.getCell(1).getNumericCellValue(),row.getCell(5).getStringCellValue());
+    }
+
+    for (int i = 5; i <= orderEntrySheet.getLastRowNum(); i++) {
+      Row row = orderEntrySheet.getRow(i);
+        if(!orderMap.containsKey((int) row.getCell(1).getNumericCellValue())) {
+          System.out.println("Order not available for Order Entry with Id : "+(int) row.getCell(1).getNumericCellValue());
+
+          XSSFRow deletedRow = deletedOrderEntrySheet.createRow(deleteSheetRowNumber++);
+
+          deletedRow
+                  .createCell(0)
+                  .setCellValue((int) orderEntrySheet.getRow(i).getCell(1).getNumericCellValue());
+          deletedRow
+                  .createCell(3)
+                  .setCellValue("Reason for deletion : No Mapping in Order Sheet");
+
+          orderEntrySheet.shiftRows(
+                  orderEntrySheet.getRow(i).getRowNum() + 1, orderEntrySheet.getLastRowNum() + 1, -1);
+          i--;
+        }
     }
   }
 
@@ -84,7 +132,7 @@ public class OrderProcessingMain {
   }
 
   private static void createOrderAndAddressImpexFile(
-          XSSFWorkbook orderWorkbook, XSSFWorkbook addressWorkBook, boolean isEnviornmentUAT) {
+          XSSFWorkbook orderWorkbook, XSSFWorkbook addressWorkBook, XSSFWorkbook deletedEntriesWorkBook, boolean isEnviornmentUAT) {
 
     CSVPrinter csvPrinter = null;
     try {
@@ -98,7 +146,7 @@ public class OrderProcessingMain {
 
       csvPrinter.println();
 
-      exportAddressDataToImpex(csvPrinter, addressWorkBook);
+      exportAddressDataToImpex(csvPrinter, addressWorkBook, deletedEntriesWorkBook);
 
     } catch (Exception e) {
       System.out.println("Failed to write Order and Address Impex file to output stream : ");
@@ -167,12 +215,11 @@ public class OrderProcessingMain {
     }
   }
 
-  private static void exportAddressDataToImpex(CSVPrinter csvPrinter, XSSFWorkbook addressWorkBook)
+  private static void exportAddressDataToImpex(CSVPrinter csvPrinter, XSSFWorkbook addressWorkBook, XSSFWorkbook deletedEntriesWorkBook)
           throws IOException {
 
     if (addressWorkBook != null) {
       Map<String, String> orderAddressMap = new HashMap<>();
-      XSSFWorkbook deletedEntriesWorkBook = new XSSFWorkbook();
       XSSFSheet addressSheet = addressWorkBook.getSheet("Address");
       XSSFSheet deletedAddressSheet = deletedEntriesWorkBook.createSheet("Deleted Addresses");
 
