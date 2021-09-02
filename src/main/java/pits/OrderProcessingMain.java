@@ -241,9 +241,9 @@ public class OrderProcessingMain {
                           "Reason for deletion : Payment or Delivery Address not available in Address Workbook");
 
           // un comment below to enable Order row removing
-          /* orderSheet.shiftRows(
+           orderSheet.shiftRows(
                   orderSheet.getRow(i).getRowNum() + 1, orderSheet.getLastRowNum() + 1, -1);
-          i--;*/
+          i--;
         }
       }
     }
