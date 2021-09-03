@@ -115,7 +115,8 @@ public class OrderProcessingMain {
     return new XSSFWorkbook(fileInputStream);
   }
 
-  private static XSSFWorkbook importAddressWorkBook(Scanner scanner, XSSFWorkbook finalAddressWorkBook) throws IOException {
+  private static XSSFWorkbook importAddressWorkBook(
+          Scanner scanner, XSSFWorkbook finalAddressWorkBook) throws IOException {
 
     System.out.println("Enter Address Workbook name with extension : ");
     String fileName = scanner.nextLine();
@@ -126,79 +127,86 @@ public class OrderProcessingMain {
     XSSFSheet addressSheet = addressWorkbook.getSheet("Address");
 
     XSSFSheet finalAddressSheet = finalAddressWorkBook.createSheet("Address");
-    for(int i=0;i<=addressSheet.getLastRowNum(); i++)
-    {
+    for (int i = 0; i <= addressSheet.getLastRowNum(); i++) {
       Row row = finalAddressSheet.createRow(i);
-      for(int j=0;j<=addressSheetColumnCount-1;j++)
-      {
+      for (int j = 0; j <= addressSheetColumnCount - 1; j++) {
 
-        if(null != addressSheet.getRow(i).getCell(j))
-        {
+        if (null != addressSheet.getRow(i).getCell(j)) {
           CellType originCellType = addressSheet.getRow(i).getCell(j).getCellType();
-          if(j>=1)
-          {
-            if(j==1) {
-              switch(originCellType){
+          if (j >= 1) {
+            if (j == 1) {
+              switch (originCellType) {
                 case BLANK:
                   row.createCell(j).setCellValue("");
-                  row.createCell(j+1).setCellValue("");
+                  row.createCell(j + 1).setCellValue("");
                   break;
 
                 case BOOLEAN:
-                  row.createCell(j).setCellValue(addressSheet.getRow(i).getCell(j).getBooleanCellValue());
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getBooleanCellValue());
+                  row.createCell(j)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getBooleanCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getBooleanCellValue());
                   break;
 
                 case ERROR:
-                  row.createCell(j).setCellErrorValue(addressSheet.getRow(i).getCell(j).getErrorCellValue());
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getErrorCellValue());
+                  row.createCell(j)
+                          .setCellErrorValue(addressSheet.getRow(i).getCell(j).getErrorCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getErrorCellValue());
                   break;
 
                 case NUMERIC:
-                  row.createCell(j).setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
+                  row.createCell(j)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
                   break;
 
                 case STRING:
-                  row.createCell(j).setCellValue(addressSheet.getRow(i).getCell(j).getStringCellValue());
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getStringCellValue());
+                  row.createCell(j)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getStringCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getStringCellValue());
                   break;
                 default:
-                  row.createCell(j).setCellFormula(addressSheet.getRow(i).getCell(j).getCellFormula());
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getCellFormula());
+                  row.createCell(j)
+                          .setCellFormula(addressSheet.getRow(i).getCell(j).getCellFormula());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getCellFormula());
               }
-              //row.createCell(j).setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
+              // row.createCell(j).setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
 
-            }
-            else
-            {
-              switch(originCellType){
+            } else {
+              switch (originCellType) {
                 case BLANK:
-                  row.createCell(j+1).setCellValue("");
+                  row.createCell(j + 1).setCellValue("");
                   break;
 
                 case BOOLEAN:
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getBooleanCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getBooleanCellValue());
                   break;
 
                 case ERROR:
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getErrorCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getErrorCellValue());
                   break;
 
                 case NUMERIC:
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getNumericCellValue());
                   break;
 
                 case STRING:
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getStringCellValue());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getStringCellValue());
                   break;
                 default:
-                  row.createCell(j+1).setCellValue(addressSheet.getRow(i).getCell(j).getCellFormula());
+                  row.createCell(j + 1)
+                          .setCellValue(addressSheet.getRow(i).getCell(j).getCellFormula());
               }
             }
-          }
-          else
-          {
+          } else {
             row.createCell(j).setCellValue(addressSheet.getRow(i).getCell(j).toString());
           }
         }
@@ -207,7 +215,7 @@ public class OrderProcessingMain {
 
     return finalAddressWorkBook;
 
-   // return new XSSFWorkbook(fileInputStream);
+    // return new XSSFWorkbook(fileInputStream);
   }
 
   private static List<CSVRecord> importExportCSVFile(Scanner scanner) throws IOException {
@@ -250,10 +258,10 @@ public class OrderProcessingMain {
 
         if (!customerEmailSet.contains(row.getCell(orderSheetEmailIndex).getStringCellValue())) {
           System.out.println(
-          "Valid Customer not found for Order(Id) = "
-                  + (int) row.getCell(orderSheetIdIndex).getNumericCellValue()
-                  + " for Customer Email = "
-                  + row.getCell(orderSheetEmailIndex).getStringCellValue());
+                  "Valid Customer not found for Order(Id) = "
+                          + (int) row.getCell(orderSheetIdIndex).getNumericCellValue()
+                          + " for Customer Email = "
+                          + row.getCell(orderSheetEmailIndex).getStringCellValue());
 
           XSSFRow deletedRow = deletedOrderEntrySheet.createRow(deleteSheetRowNumber++);
 
@@ -330,7 +338,7 @@ public class OrderProcessingMain {
                           "Reason for deletion : Payment or Delivery Address not available in Address Workbook");
 
           // un comment below to enable Order row removing
-           orderSheet.shiftRows(
+          orderSheet.shiftRows(
                   orderSheet.getRow(i).getRowNum() + 1, orderSheet.getLastRowNum() + 1, -1);
           i--;
         }
@@ -356,7 +364,6 @@ public class OrderProcessingMain {
 
     deleteSheetRowNumber++;
 
-
     TreeMap<Integer, String> orderMap = new TreeMap<>();
 
     for (int j = orderSheetStartRow; j <= orderSheet.getLastRowNum(); j++) {
@@ -369,30 +376,29 @@ public class OrderProcessingMain {
     for (int i = addressSheetStartRow; i <= addressSheet.getLastRowNum(); i++) {
 
       Row row;
-      int orderId = 0;
+      int orderId;
       if (null != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex)
-              && "" != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex).toString()
-              && CellType.BLANK != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex).getCellType()) {
+              && !""
+              .equalsIgnoreCase(
+                      addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex).toString())
+              && CellType.BLANK
+              != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex).getCellType()) {
 
         row = addressSheet.getRow(i);
         orderId = (int) row.getCell(addressSheetCustomerUidIndex).getNumericCellValue();
 
-
         if (!orderMap.containsKey(orderId)) {
-          System.out.println(
-                  "Order not available for Address with Order Id : "
-                          + orderId);
+          System.out.println("Order not available for Address with Order Id : " + orderId);
           XSSFRow deletedRow = deletedAddressSheet.createRow(deleteSheetRowNumber++);
 
+          deletedRow.createCell(0).setCellValue(orderId);
           deletedRow
-                  .createCell(0)
-                  .setCellValue(orderId);
-          deletedRow.createCell(3).setCellValue("Reason for deletion : Order Id is not present in order sheet");
+                  .createCell(3)
+                  .setCellValue("Reason for deletion : Order Id is not present in order sheet");
 
           addressSheet.shiftRows(
                   addressSheet.getRow(i).getRowNum() + 1, addressSheet.getLastRowNum() + 1, -1);
           i--;
-
         }
       }
     }
@@ -429,9 +435,9 @@ public class OrderProcessingMain {
     for (int i = orderEntrySheetStartRow; i <= orderEntrySheet.getLastRowNum(); i++) {
       Row row = orderEntrySheet.getRow(i);
       if (!orderMap.containsKey((int) row.getCell(orderSheetIdIndex).getNumericCellValue())) {
-         System.out.println(
-        "Order not available for Order Entry with Id : "
-                + (int) row.getCell(orderSheetIdIndex).getNumericCellValue());
+        System.out.println(
+                "Order not available for Order Entry with Id : "
+                        + (int) row.getCell(orderSheetIdIndex).getNumericCellValue());
 
         XSSFRow deletedRow = deletedOrderEntrySheet.createRow(deleteSheetRowNumber++);
 
@@ -569,7 +575,7 @@ public class OrderProcessingMain {
       for (int i = addressSheetStartRow; i <= addressSheet.getLastRowNum(); i++) {
         Row row = addressSheet.getRow(i);
         if (null != row.getCell(addressSheetIdIndex)
-                && row.getCell(addressSheetIdIndex).getCellType() != CellType.BLANK ) {
+                && row.getCell(addressSheetIdIndex).getCellType() != CellType.BLANK) {
           if (!orderAddressMap.containsKey(row.getCell(addressSheetIdIndex).toString())) {
             orderAddressMap.put(
                     row.getCell(addressSheetIdIndex).toString(),
