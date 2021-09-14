@@ -1,6 +1,7 @@
 package pits;
 
 import org.apache.commons.csv.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -85,8 +86,7 @@ public class OrderProcessingMain {
       exportingFinalOrderEntryWorkbook(orderEntryWorkBook);
 
       System.out.println("Started creating Order-Address impex file");
-      createOrderAndAddressImpexFile(
-              orderWorkBook, addressWorkBook, deletedEntriesWorkBook, isEnvironmentUAT);
+      createOrderAndAddressImpexFile(orderWorkBook, addressWorkBook, deletedEntriesWorkBook, isEnvironmentUAT);
 
       System.out.println("Started creating Order Entry impex file");
       createOrderEntryImpexFile(orderEntryWorkBook);
@@ -665,8 +665,7 @@ public class OrderProcessingMain {
           if (null != cell && cell.getCellType() != CellType.BLANK) {
             if (i == 2) {
               csvPrinter.print("entryNumber[unique=true]");
-            }
-            else {
+            } else {
               csvPrinter.print(cell.toString());
             }
           }
@@ -680,13 +679,18 @@ public class OrderProcessingMain {
               if (null != row.getCell(j) && row.getCell(j).getCellType() != CellType.BLANK) {
                 String value = row.getCell(j).toString();
 
-                if (j != orderEntrySheetBasePriceIndex
+                if (j == 3) {
+                  if (!value.equalsIgnoreCase("froldproduct")) {
+                    int productCode = (int) (row.getCell(j).getNumericCellValue());
+                    value = StringUtils.leftPad(String.valueOf(productCode), 18, "0");
+
+                  }
+                } else if (j != orderEntrySheetBasePriceIndex
                         && j != orderEntrySheetTotalPriceIndex
                         && row.getCell(j).getCellType() == CellType.NUMERIC
                         && value.contains(".")) {
                   value = value.split("\\.")[0];
                 }
-
                 csvPrinter.print(value);
               } else csvPrinter.print(null);
             }
