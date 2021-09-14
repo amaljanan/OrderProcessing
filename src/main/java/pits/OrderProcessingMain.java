@@ -53,6 +53,7 @@ public class OrderProcessingMain {
       System.out.println("Importing Excel files");
       XSSFWorkbook finalAddressWorkBook = new XSSFWorkbook();
 
+
       XSSFWorkbook orderWorkBook = importOrderWorkBook(scanner);
 
       XSSFWorkbook orderEntryWorkBook = importOrderEntryWorkBook(scanner);
@@ -76,6 +77,11 @@ public class OrderProcessingMain {
 
       System.out.println("Validating Customer Order Entry with Order Id.....");
       validateOrderEntryMapping(orderWorkBook, orderEntryWorkBook, deletedEntriesWorkBook);
+
+      System.out.println("Exporting the final  Excel Sheet...");
+      exportingFinalAddressWorkbook(addressWorkBook);
+      exportingFinalOrderWorkbook(orderWorkBook);
+      exportingFinalOrderEntryWorkbook(orderEntryWorkBook);
 
       System.out.println("Started creating Order-Address impex file");
       createOrderAndAddressImpexFile(
@@ -295,7 +301,7 @@ public class OrderProcessingMain {
 
     deleteSheetRowNumber++;
 
-    TreeMap<Integer, String> addressIdMap = new TreeMap<>();
+    TreeMap<String, String> addressIdMap = new TreeMap<>();
 
     for (int j = addressSheetStartRow; j <= addressSheet.getLastRowNum(); j++) {
       Row row = addressSheet.getRow(j);
@@ -304,7 +310,7 @@ public class OrderProcessingMain {
               && null != row.getCell(addressSheetCustomerUidIndex)
               && row.getCell(addressSheetCustomerUidIndex).getCellType() != CellType.BLANK) {
         addressIdMap.put(
-                (int) row.getCell(addressSheetIdIndex).getNumericCellValue(),
+                 row.getCell(addressSheetIdIndex).toString(), //(int) row.getCell(addressSheetIdIndex).getNumericCellValue()
                 row.getCell(addressSheetCustomerUidIndex).toString());
       }
     }
@@ -317,21 +323,21 @@ public class OrderProcessingMain {
               && row.getCell(orderSheetPaymentAddressIndex).getCellType() != CellType.BLANK) {
 
         if (!addressIdMap.containsKey(
-                (int) row.getCell(orderSheetDeliveryAddressIndex).getNumericCellValue())
+                 row.getCell(orderSheetDeliveryAddressIndex).toString())
                 || !addressIdMap.containsKey(
-                (int) row.getCell(orderSheetPaymentAddressIndex).getNumericCellValue())) {
+                row.getCell(orderSheetPaymentAddressIndex).toString())) {
           System.out.println(
                   "Payment or Delivery Address ind not available for Order(Id) = "
-                          + (int) row.getCell(orderSheetIdIndex).getNumericCellValue()
+                          +  row.getCell(orderSheetIdIndex).toString()
                           + " for AddressId = "
-                          + (int) row.getCell(orderSheetDeliveryAddressIndex).getNumericCellValue());
+                          +  row.getCell(orderSheetDeliveryAddressIndex).toString());
 
           XSSFRow deletedRow = deletedOrderEntrySheet.createRow(deleteSheetRowNumber++);
 
           deletedRow
                   .createCell(0)
                   .setCellValue(
-                          (int) orderSheet.getRow(i).getCell(orderSheetIdIndex).getNumericCellValue());
+                        String.valueOf((int) orderSheet.getRow(i).getCell(orderSheetIdIndex).getNumericCellValue()));
           deletedRow
                   .createCell(3)
                   .setCellValue(
@@ -364,19 +370,19 @@ public class OrderProcessingMain {
 
     deleteSheetRowNumber++;
 
-    TreeMap<Integer, String> orderMap = new TreeMap<>();
+    TreeMap<String, String> orderMap = new TreeMap<>();
 
     for (int j = orderSheetStartRow; j <= orderSheet.getLastRowNum(); j++) {
       Row row = orderSheet.getRow(j);
       orderMap.put(
-              (int) row.getCell(orderSheetIdIndex).getNumericCellValue(),
+               String.valueOf((int) row.getCell(orderSheetIdIndex).getNumericCellValue()),
               row.getCell(orderSheetEmailIndex).getStringCellValue());
     }
 
     for (int i = addressSheetStartRow; i <= addressSheet.getLastRowNum(); i++) {
 
       Row row;
-      int orderId;
+      String orderId;
       if (null != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex)
               && !""
               .equalsIgnoreCase(
@@ -385,7 +391,7 @@ public class OrderProcessingMain {
               != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex).getCellType()) {
 
         row = addressSheet.getRow(i);
-        orderId = (int) row.getCell(addressSheetCustomerUidIndex).getNumericCellValue();
+        orderId = row.getCell(addressSheetCustomerUidIndex).toString();
 
         if (!orderMap.containsKey(orderId)) {
           System.out.println("Order not available for Address with Order Id : " + orderId);
@@ -575,7 +581,9 @@ public class OrderProcessingMain {
       for (int i = addressSheetStartRow; i <= addressSheet.getLastRowNum(); i++) {
         Row row = addressSheet.getRow(i);
         if (null != row.getCell(addressSheetIdIndex)
-                && row.getCell(addressSheetIdIndex).getCellType() != CellType.BLANK) {
+                && row.getCell(addressSheetIdIndex).getCellType() != CellType.BLANK
+                && !row.getCell(addressSheetIdIndex).getCellType().equals("")
+        && null != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex)) {
           if (!orderAddressMap.containsKey(row.getCell(addressSheetIdIndex).toString())) {
             orderAddressMap.put(
                     row.getCell(addressSheetIdIndex).toString(),
@@ -680,4 +688,33 @@ public class OrderProcessingMain {
       }
     }
   }
+
+  private static void exportingFinalAddressWorkbook(XSSFWorkbook addressWorkbook)
+          throws IOException {
+
+    FileOutputStream addressFileOutputStream = new FileOutputStream("./Target Folder/OrderAddress.xlsx");
+    addressWorkbook.write(addressFileOutputStream);
+
+    addressFileOutputStream.close();
+  }
+
+  private static void exportingFinalOrderWorkbook(XSSFWorkbook orderWorkBook)
+          throws IOException {
+
+    FileOutputStream orderFileOutputStream = new FileOutputStream("./Target Folder/Order.xlsx");
+    orderWorkBook.write(orderFileOutputStream);
+
+    orderFileOutputStream.close();
+  }
+
+  private static void exportingFinalOrderEntryWorkbook(XSSFWorkbook orderEntryWorkBook)
+          throws IOException {
+
+    FileOutputStream orderEntryFileOutputStream = new FileOutputStream("./Target Folder/OrderEntry.xlsx");
+    orderEntryWorkBook.write(orderEntryFileOutputStream);
+
+    orderEntryFileOutputStream.close();
+  }
+
+
 }
