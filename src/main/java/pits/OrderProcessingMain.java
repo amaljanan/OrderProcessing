@@ -22,6 +22,7 @@ public class OrderProcessingMain {
   private static final int orderSheetDiscountIndex = 12;
   private static final int orderSheetDeliveryAddressIndex = 15;
   private static final int orderSheetPaymentAddressIndex = 16;
+  private static final int orderSheetTotalPriceIndex = 13;
 
   private static final int addressSheetColumnCount = 15;
   private static final int addressSheetIdIndex = 1;
@@ -310,7 +311,7 @@ public class OrderProcessingMain {
               && null != row.getCell(addressSheetCustomerUidIndex)
               && row.getCell(addressSheetCustomerUidIndex).getCellType() != CellType.BLANK) {
         addressIdMap.put(
-                 row.getCell(addressSheetIdIndex).toString(), //(int) row.getCell(addressSheetIdIndex).getNumericCellValue()
+                row.getCell(addressSheetIdIndex).toString(), //(int) row.getCell(addressSheetIdIndex).getNumericCellValue()
                 row.getCell(addressSheetCustomerUidIndex).toString());
       }
     }
@@ -323,21 +324,21 @@ public class OrderProcessingMain {
               && row.getCell(orderSheetPaymentAddressIndex).getCellType() != CellType.BLANK) {
 
         if (!addressIdMap.containsKey(
-                 row.getCell(orderSheetDeliveryAddressIndex).toString())
+                row.getCell(orderSheetDeliveryAddressIndex).toString())
                 || !addressIdMap.containsKey(
                 row.getCell(orderSheetPaymentAddressIndex).toString())) {
           System.out.println(
                   "Payment or Delivery Address ind not available for Order(Id) = "
-                          +  row.getCell(orderSheetIdIndex).toString()
+                          + row.getCell(orderSheetIdIndex).toString()
                           + " for AddressId = "
-                          +  row.getCell(orderSheetDeliveryAddressIndex).toString());
+                          + row.getCell(orderSheetDeliveryAddressIndex).toString());
 
           XSSFRow deletedRow = deletedOrderEntrySheet.createRow(deleteSheetRowNumber++);
 
           deletedRow
                   .createCell(0)
                   .setCellValue(
-                        String.valueOf((int) orderSheet.getRow(i).getCell(orderSheetIdIndex).getNumericCellValue()));
+                          String.valueOf((int) orderSheet.getRow(i).getCell(orderSheetIdIndex).getNumericCellValue()));
           deletedRow
                   .createCell(3)
                   .setCellValue(
@@ -375,7 +376,7 @@ public class OrderProcessingMain {
     for (int j = orderSheetStartRow; j <= orderSheet.getLastRowNum(); j++) {
       Row row = orderSheet.getRow(j);
       orderMap.put(
-               String.valueOf((int) row.getCell(orderSheetIdIndex).getNumericCellValue()),
+              String.valueOf((int) row.getCell(orderSheetIdIndex).getNumericCellValue()),
               row.getCell(orderSheetEmailIndex).getStringCellValue());
     }
 
@@ -502,11 +503,17 @@ public class OrderProcessingMain {
       XSSFSheet orderSheet = orderWorkbook.getSheet("Order");
 
       Row headerRow = orderSheet.getRow(2);
-      Iterator<Cell> cellIterator = headerRow.cellIterator();
-      while (cellIterator.hasNext()) {
-        Cell cell = cellIterator.next();
+      for (int i = 0; i <= orderSheetColumnCount; i++) {
+
+        Cell cell = headerRow.getCell(i);
         if (null != cell && cell.getCellType() != CellType.BLANK) {
-          csvPrinter.print(cell.toString());
+          if (i == orderSheetDeliveryAddressIndex) {
+            csvPrinter.print("deliveryAddress(&addrId)");
+          } else if (i == orderSheetPaymentAddressIndex) {
+            csvPrinter.print("paymentAddress(&addrId)");
+          } else {
+            csvPrinter.print(cell.toString());
+          }
         }
       }
       csvPrinter.println();
@@ -539,6 +546,11 @@ public class OrderProcessingMain {
                       && (row.getCell(j).getCellType() == CellType.NUMERIC
                       && value.contains("."))) {
                 value = value.split("\\.")[0];
+              } else if (j == orderSheetTotalPriceIndex) {
+                double totalPrice = row.getCell(j).getNumericCellValue();
+                totalPrice = Math.round(totalPrice * 100.0) / 100.0;
+                value = String.valueOf(totalPrice);
+
               }
 
               csvPrinter.print(value);
@@ -570,11 +582,16 @@ public class OrderProcessingMain {
       deleteSheetRowNumber++;
 
       Row headerRow = addressSheet.getRow(2);
-      Iterator<Cell> cellIterator = headerRow.cellIterator();
-      while (cellIterator.hasNext()) {
-        Cell cell = cellIterator.next();
+      for (int i = 0; i <= addressSheetColumnCount; i++) {
+        Cell cell = headerRow.getCell(i);
         if (null != cell && cell.getCellType() != CellType.BLANK) {
-          csvPrinter.print(cell.toString());
+          if (i == 1) {
+            csvPrinter.print("&addrId");
+          } else if (i == 2) {
+            csvPrinter.print("sapCustomerId[unique=true]");
+          } else {
+            csvPrinter.print(cell.toString());
+          }
         }
       }
       csvPrinter.println();
@@ -583,7 +600,7 @@ public class OrderProcessingMain {
         if (null != row.getCell(addressSheetIdIndex)
                 && row.getCell(addressSheetIdIndex).getCellType() != CellType.BLANK
                 && !row.getCell(addressSheetIdIndex).getCellType().equals("")
-        && null != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex)) {
+                && null != addressSheet.getRow(i).getCell(addressSheetCustomerUidIndex)) {
           if (!orderAddressMap.containsKey(row.getCell(addressSheetIdIndex).toString())) {
             orderAddressMap.put(
                     row.getCell(addressSheetIdIndex).toString(),
@@ -643,11 +660,15 @@ public class OrderProcessingMain {
         csvPrinter.println();
 
         Row headerRow = orderEntrySheet.getRow(3);
-        Iterator<Cell> cellIterator = headerRow.cellIterator();
-        while (cellIterator.hasNext()) {
-          Cell cell = cellIterator.next();
+        for (int i = 0; i <= orderEntrySheetColumnCount; i++) {
+          Cell cell = headerRow.getCell(i);
           if (null != cell && cell.getCellType() != CellType.BLANK) {
-            csvPrinter.print(cell.toString());
+            if (i == 2) {
+              csvPrinter.print("entryNumber[unique=true]");
+            }
+            else {
+              csvPrinter.print(cell.toString());
+            }
           }
         }
         csvPrinter.println();
