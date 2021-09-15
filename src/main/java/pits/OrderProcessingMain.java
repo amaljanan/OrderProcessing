@@ -69,24 +69,24 @@ public class OrderProcessingMain {
       XSSFWorkbook deletedEntriesWorkBook = new XSSFWorkbook();
 
       System.out.println("Validating Customer Email with Order Email.....");
-      validateCustomerEmailInOrder(orderWorkBook, list, deletedEntriesWorkBook);
+     // validateCustomerEmailInOrder(orderWorkBook, list, deletedEntriesWorkBook);
 
       System.out.println("Validating Order Payment and Delivery Address.....");
-      validateOrderAddress(orderWorkBook, addressWorkBook, deletedEntriesWorkBook);
+     // validateOrderAddress(orderWorkBook, addressWorkBook, deletedEntriesWorkBook);
 
       System.out.println("Validating Order Address.....");
-      removeAddress(orderWorkBook, addressWorkBook, deletedEntriesWorkBook);
+     // removeAddress(orderWorkBook, addressWorkBook, deletedEntriesWorkBook);
 
       System.out.println("Validating Customer Order Entry with Order Id.....");
-      validateOrderEntryMapping(orderWorkBook, orderEntryWorkBook, deletedEntriesWorkBook);
+     // validateOrderEntryMapping(orderWorkBook, orderEntryWorkBook, deletedEntriesWorkBook);
 
       System.out.println("Exporting the final  Excel Sheet...");
-      exportingFinalAddressWorkbook(addressWorkBook);
-      exportingFinalOrderWorkbook(orderWorkBook);
-      exportingFinalOrderEntryWorkbook(orderEntryWorkBook);
+     // exportingFinalAddressWorkbook(addressWorkBook);
+     // exportingFinalOrderWorkbook(orderWorkBook);
+     // exportingFinalOrderEntryWorkbook(orderEntryWorkBook);
 
       System.out.println("Started creating Order-Address impex file");
-      createOrderAndAddressImpexFile(orderWorkBook, addressWorkBook, deletedEntriesWorkBook, isEnvironmentUAT);
+    //  createOrderAndAddressImpexFile(orderWorkBook, addressWorkBook, deletedEntriesWorkBook, isEnvironmentUAT);
 
       System.out.println("Started creating Order Entry impex file");
       createOrderEntryImpexFile(orderEntryWorkBook);
@@ -646,7 +646,7 @@ public class OrderProcessingMain {
       csvPrinter =
               new CSVPrinter(
                       new FileWriter("./Target Folder/OrderEntryImpex.impex"),
-                      CSVFormat.EXCEL.withDelimiter(';').withTrim());
+                      CSVFormat.EXCEL.withDelimiter(';').withTrim().withEscape(' ').withQuoteMode(QuoteMode.NONE));
 
       if (orderEntryWorkBook != null) {
         XSSFSheet orderEntrySheet = orderEntryWorkBook.getSheet("OrderEntry");
@@ -657,6 +657,10 @@ public class OrderProcessingMain {
 
         Cell catalogVersionCell = orderEntrySheet.getRow(1).getCell(0);
         csvPrinter.print(catalogVersionCell.toString());
+        csvPrinter.println();
+
+        Cell localeCell = orderEntrySheet.getRow(2).getCell(0);
+        csvPrinter.print(localeCell.toString());
         csvPrinter.println();
 
         Row headerRow = orderEntrySheet.getRow(3);
